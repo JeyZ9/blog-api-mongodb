@@ -1,0 +1,29 @@
+const mongoose = require("mongoose");
+const UserModel = require("./User");
+const { Schema, model } = mongoose;
+
+const PostSchema = new Schema({
+  title: {
+    type: String,
+    require: true,
+  },
+  summary: {
+    type: String,
+    require: true,
+  },
+  content: {
+    type: String,
+    require: true,
+  },
+  cover: {
+    type: String,
+    require: true
+  },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: UserModel
+  },
+}, {timestamps: true,});
+
+const PostModel = model("Post", PostSchema);
+module.exports = PostModel;

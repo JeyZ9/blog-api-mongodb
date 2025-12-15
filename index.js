@@ -7,6 +7,8 @@ const cors = require("cors");
 const FRONT_END_URL = process.env.FRONT_END_URL;
 const PORT = process.env.PORT;
 const DB_URL = process.env.DB_URL;
+const UserRouter = require("./routers/user.router.js");
+const PostRouter = require("./routers/post.router.js");
 
 const app = express();
 app.use(express.json());
@@ -33,6 +35,9 @@ if(!DB_URL){
         
     })
 }
+
+app.use("/api/v1/users", UserRouter);
+app.use("/api/v1/posts", PostRouter);
 
 app.listen(PORT, () => {
     console.log(`http://localhost:${PORT}`)

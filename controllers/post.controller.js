@@ -1,8 +1,12 @@
 const PostModel = require("../models/Post.js");
 const UserModel = require("../models/User.js");
 
+
 exports.createPost = async (req, res) => {
-    const { title, summary, content, cover } = req.body;
+  if(!req.cover){
+    return res.status(400).json({message: "Cover image is require"})
+  }
+    const { title, summary, content } = req.body;
     const authorId = req.authorId;
 
     if(!title || !summary || !content || !cover) {
@@ -31,7 +35,7 @@ exports.createPost = async (req, res) => {
             title,
             summary,
             content,
-            cover,
+            cover: req.cover.firebaseUrl,
             author
         });
 

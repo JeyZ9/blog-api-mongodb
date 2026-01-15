@@ -3,13 +3,15 @@ const UserModel = require("../models/User.js");
 
 
 exports.createPost = async (req, res) => {
-  if(!req.cover){
-    return res.status(400).json({message: "Cover image is require"})
+  if (!req.file || !req.file.supabaseUrl) {
+    return res.status(400).json({
+      message: "Cover image is required"
+    });
   }
     const { title, summary, content } = req.body;
     const authorId = req.authorId;
 
-    if(!title || !summary || !content || !cover) {
+    if(!title || !summary || !content) {
         return res.status(400).send({
           message: "Please provide all fields.",
         });
@@ -35,7 +37,7 @@ exports.createPost = async (req, res) => {
             title,
             summary,
             content,
-            cover: req.cover.firebaseUrl,
+            cover: req.file.supabaseUrl,
             author
         });
 

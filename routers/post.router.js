@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const PostController = require("../controllers/post.controller.js");
 const authJwt = require("../middlewares/authJWT.middleware.js");
-const {upload, uploadToFirebase} = require("../middlewares/file.middleware");
+// const { uploadToFirebase} = require("../middlewares/file.middleware");
+const { upload, uploadToSupabase } = require("../middlewares/supabase.middleware.js");
 
-router.post("", authJwt.verifyToken, upload, uploadToFirebase, PostController.createPost);
+router.post("", authJwt.verifyToken, upload, uploadToSupabase, PostController.createPost);
 router.get("", PostController.getAllPosts);
 router.get("/:id", PostController.getById);
 router.get("/author/:id", PostController.getByAuthorId);

@@ -60,7 +60,31 @@ async function uploadToSupabase(req, res, next) {
   }
 }
 
+function getFilePathFromPublicUrl(publicUrl) {
+  const bucketName = "blog-cover";
+  const index = publicUrl.indexOf(bucketName);
+  return publicUrl.substring(index + bucketName.length + 1);
+}
+
+async function deleteFromSupabaseByUrl(publicUrl) {
+  try {
+    const filePath = getFilePathFromPublicUrl(publicUrl);
+
+    const { error } = await supabase.storage
+      .from("blog-cover")
+      .remove([filePath]);
+
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 module.exports = {
   upload,
-  uploadToSupabase
+  uploadToSupabase,
+  deleteFromSupabaseByUrl,
 };

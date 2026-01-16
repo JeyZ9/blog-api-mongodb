@@ -9,6 +9,6 @@ router.post("", authJwt.verifyToken, upload, uploadToSupabase, PostController.cr
 router.get("", PostController.getAllPosts);
 router.get("/:id", PostController.getById);
 router.get("/author/:id", PostController.getByAuthorId);
-router.put("/:id", authJwt.verifyToken, PostController.updatePost);
+router.put("/:id", authJwt.verifyToken, upload, uploadToSupabase, PostController.updatePost);
 router.delete("/:id", authJwt.verifyToken, PostController.deletePost);
 module.exports = router;

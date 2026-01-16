@@ -1,5 +1,6 @@
 const PostModel = require("../models/Post.js");
 const UserModel = require("../models/User.js");
+const {deleteFromSupabaseByUrl} = require("../middlewares/supabase.middleware.js")
 
 
 exports.createPost = async (req, res) => {
@@ -134,63 +135,57 @@ exports.getByAuthorId = async (req, res) => {
 }
 
 exports.updatePost = async (req, res) => {
-    const { id } = req.params;
-    const { title, summary, content, cover } = req.body;
-    const authorId = req.authorId;
+  const { id } = req.params;
+  const { title, summary, content } = req.body;
+  const authorId = req.authorId;
 
-    if (!id) {
+  if (!id) {
+    return res.status(404).send({ message: "Post id is missing." });
+  }
+
+  if (!authorId) {
+    return res.status(401).send({ message: "Author id is missing." });
+  }
+
+  if (!title || !summary || !content) {
+    return res.status(400).send({ message: "Please provide all fields." });
+  }
+
+  try {
+    const post = await PostModel.findOne({
+      _id: id,
+      author: authorId,
+    });
+
+    if (!post) {
       return res.status(404).send({
-        message: "Post id is missing.",
+        message: "Post not found or unauthorized.",
       });
     }
 
-    if (!title || !summary || !content || !cover || !authorId) {
-      return res.status(400).send({
-        message: "Please provide all fields.",
-      });
+    post.title = title;
+    post.summary = summary;
+    post.content = content;
+
+    if (req.file.supabaseUrl) {
+      if (post.cover) {
+        await deleteFromSupabaseByUrl(post.cover);
+      }
+
+      post.cover = req.file.supabaseUrl;
     }
 
-    try{
-        const post = await PostModel.findOne({ _id: id, author: authorId }).populate("author", [
-          "username",
-        ]);
+    await post.save();
 
-        if(!post) {
-            return res.status(404).send({
-              message: "Post not found.",
-            });
-        }
-
-        if(post.length < 0) {
-            return res.status(403).send({
-                message: "Unauthorize to edit this post, because you are not the author of this post."
-            })
-        } else{
-            post.title = title;
-            post.summary = summary;
-            post.content = content;
-            post.cover = cover;
-
-            await post.save();
-        }
-
-        // await PostModel.updateOne(post._id, {
-        //   title,
-        //   summary,
-        //   content,
-        //   cover,
-        // });
-
-        res.send({
-          message: "Update post successfully.",
-        });
-
-    }catch(e) {
-        res.status(500).send({
-          message: e.message || "Something occurred while update post.",
-        });
-    }
-}
+    res.send({
+      message: "Update post successfully.",
+    });
+  } catch (e) {
+    res.status(500).send({
+      message: e.message || "Something occurred while update post.",
+    });
+  }
+};
 
 exports.deletePost = async (req, res) => {
     const { id } = req.params;

@@ -173,6 +173,8 @@ exports.updatePost = async (req, res) => {
       }
 
       post.cover = req.file.supabaseUrl;
+    }else{
+      post.cover = post.cover;
     }
 
     await post.save();
